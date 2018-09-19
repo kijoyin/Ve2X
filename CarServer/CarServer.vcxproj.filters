@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="bluez_server.c" />
+    <ClCompile Include="util.c" />
+    <ClCompile Include="main.c" />
+    <ClCompile Include="control_car.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\bluez_server.h" />
+    <ClInclude Include="include\util.h" />
+    <ClInclude Include="include\control_car.h" />
+  </ItemGroup>
+</Project>

@@ -60,9 +60,29 @@
   <ImportGroup Label="Shared" />
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <ProjectPublicIncludePath>
+    </ProjectPublicIncludePath>
+  </PropertyGroup>
   <ItemGroup>
+    <ClCompile Include="bluez_server.c" />
+    <ClCompile Include="control_car.c" />
+    <ClCompile Include="main.c" />
+    <ClCompile Include="util.c" />
   </ItemGroup>
-  <ItemDefinitionGroup />
+  <ItemGroup>
+    <ClInclude Include="include\bluez_server.h" />
+    <ClInclude Include="include\control_car.h" />
+    <ClInclude Include="include\util.h" />
+  </ItemGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(ClCompile.AdditionalIncludeDirectories);include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <LibraryDependencies>bluetooth;pthread;rt;wiringPi</LibraryDependencies>
+    </Link>
+  </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
 </Project>
