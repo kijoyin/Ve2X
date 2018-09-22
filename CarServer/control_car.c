@@ -1,11 +1,10 @@
 #include <wiringPi.h>
 #include <stdbool.h>
-#include <softPwm.h>
 
-static int leftForwardPin = 28;
-static int leftBackwardPin = 29;
-static int rightForwardPin = 24;
-static int rightBackwardPin = 25;
+static int leftForwardPin = 29;
+static int leftBackwardPin = 28;
+static int rightForwardPin = 25;
+static int rightBackwardPin = 24;
 static int pmwPin = 1;
 static int speed = 800;
 static bool forward = true;
@@ -24,7 +23,7 @@ void init_car()
 }
 void start_car()
 {
-	speed = 50;
+	speed = 800;
 	forward = true;
 	pwmWrite(pmwPin, speed);
 	digitalWrite(leftBackwardPin, LOW);
@@ -40,6 +39,7 @@ void stop_car()
 }
 void reverse_car()
 {
+	AllLow();
 	forward = false;
 	digitalWrite(leftBackwardPin, HIGH);
 	digitalWrite(leftForwardPin, LOW);
@@ -75,7 +75,7 @@ void stop_start_left()
 {
 	digitalWrite(leftBackwardPin, LOW);
 	digitalWrite(leftForwardPin, LOW);
-	delayMicroseconds(10);
+	delayMicroseconds(1000000);
 	if (forward)
 	{
 		digitalWrite(leftForwardPin, HIGH);
@@ -91,7 +91,7 @@ void stop_start_right()
 {
 	digitalWrite(rightBackwardPin, LOW);
 	digitalWrite(rightForwardPin, LOW);
-	delayMicroseconds(10);
+	delayMicroseconds(1000000);
 	if (forward)
 	{
 		digitalWrite(rightForwardPin, HIGH);

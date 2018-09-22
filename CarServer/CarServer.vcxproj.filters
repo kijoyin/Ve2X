@@ -4,12 +4,14 @@
     <ClCompile Include="bluez_server.c" />
     <ClCompile Include="control_car.c" />
     <ClCompile Include="util.c" />
-    <ClCompile Include="traffic_light.cpp" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="calculate_speed.c" />
+    <ClCompile Include="traffic_light.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\bluez_server.h" />
     <ClInclude Include="include\control_car.h" />
     <ClInclude Include="include\util.h" />
+    <ClInclude Include="include\calculate_speed.h" />
   </ItemGroup>
 </Project>
