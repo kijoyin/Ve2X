@@ -162,16 +162,13 @@ int init_server() {
 	return client;
 }
 
-char *read_server(int client) {
+int read_server(int client, char *input) {
 	// read data from the client
-	char input[1024] = { 0 };
 	int bytes_read;
 	bytes_read = read(client, input, sizeof(input));
-	if (bytes_read > 0) {
+	while (bytes_read > 0) {
 		printf("received [%s]\n", input);
-		return input;
-	} else {
-		return "";
+		return 1;
 	}
 }
 

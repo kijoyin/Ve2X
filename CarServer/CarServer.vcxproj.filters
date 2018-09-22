@@ -2,13 +2,14 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="bluez_server.c" />
-    <ClCompile Include="util.c" />
-    <ClCompile Include="main.c" />
     <ClCompile Include="control_car.c" />
+    <ClCompile Include="util.c" />
+    <ClCompile Include="traffic_light.cpp" />
+    <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\bluez_server.h" />
-    <ClInclude Include="include\util.h" />
     <ClInclude Include="include\control_car.h" />
+    <ClInclude Include="include\util.h" />
   </ItemGroup>
 </Project>

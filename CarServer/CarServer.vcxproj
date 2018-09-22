@@ -68,6 +68,7 @@
     <ClCompile Include="bluez_server.c" />
     <ClCompile Include="control_car.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="traffic_light.cpp" />
     <ClCompile Include="util.c" />
   </ItemGroup>
   <ItemGroup>

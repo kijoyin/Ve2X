@@ -15,6 +15,7 @@
 #include <signal.h>
 #include <util.h>
 #include <control_car.h>
+#include <bluez_server.h>
 #include <sys/time.h>
 #include <sys/stat.h>
 #include <mqueue.h>
@@ -23,6 +24,8 @@
 
 
 #define CAR_CMD_NAME "/car_cmd"
+
+char carCMD[1024];
 
 pthread_t carReceiverThread;
 pthread_t carControllerThread;
@@ -44,6 +47,8 @@ void sig_handler(int signum) {
 
 	printf("Received SIGINT. Exiting Application\n");
 
+	AllLow();// Clean up the pins
+
 	pthread_cancel(carReceiverThread);
 	pthread_cancel(carControllerThread);
 
@@ -60,7 +65,7 @@ int main(void) {
 	signal(SIGINT, sig_handler);
 
 	counter = 0;
-	init_car();
+	//init_car();
 
 	my_mq_attr.mq_maxmsg = 10;
 	my_mq_attr.mq_msgsize = sizeof(counter);
@@ -102,13 +107,21 @@ void carReceiver_main(void) {
 	int status;
 
 	exec_period_usecs = 1000000; /*in micro-seconds*/
-
+	int client = init_server();
+	printf("Client = %d \n", \
+		client);
 	printf("Thread 1 started. Execution period = %d uSecs\n", \
 		exec_period_usecs);
 	while (1) {
-		status = mq_send(my_mq, (const char*)&counter, sizeof(counter), 1);
+		int cmd = 1;// read_server(client, carCMD);
+		int bytes_read = 0;
+		bytes_read = read(client, carCMD, 1);
+		if (bytes_read > 0) {
+			printf("received [%s]\n", carCMD);
+		}
+		printf("Message = %s \n", carCMD);
+		status = mq_send(my_mq, (const char*)&cmd, sizeof(counter), 1);
 		ASSERT(status != -1);
-		usleep(exec_period_usecs);
 	}
 }
 
@@ -133,11 +146,11 @@ void carController_main(void) {
 			printf("RECVd MSG in Car: %d\n", recv_counter);
 			if (recv_counter == 0)
 			{
-				start_car();
+				//start_car();
 			}
-			else if(counter == 100)
+			else if(counter == 25)
 			{
-				stop_car();
+				//stop_car();
 			}
 			counter += 1;
 		}

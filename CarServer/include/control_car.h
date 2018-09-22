@@ -1,4 +1,5 @@
 #pragma once
+#include <stdbool.h>
 
 void init_car();
 void start_car();

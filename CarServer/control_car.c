@@ -1,7 +1,6 @@
 #include <wiringPi.h>
 #include <stdbool.h>
 #include <softPwm.h>
-#include "include\control_car.h"
 
 static int leftForwardPin = 28;
 static int leftBackwardPin = 29;
