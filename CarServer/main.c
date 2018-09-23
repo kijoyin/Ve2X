@@ -1,14 +1,3 @@
-/* Example code for starting
- * 2 threads and synchronizing
- * their operation using a message_queue.
- *
- * All code provided is as is
- * and not completely tested
- *
- * Author: Aadil Rizvi
- * Date: 6/1/2016
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -16,6 +5,8 @@
 #include <util.h>
 #include <control_car.h>
 #include <bluez_server.h>
+#include <ultrasonic_distance.h>
+#include <wiringPi.h>
 #include <sys/time.h>
 #include <sys/stat.h>
 #include <mqueue.h>
@@ -24,7 +15,6 @@
 #include <calculate_speed.h>
 #include <GlobalV.h>
 
-extern void init_sensor();
 
 #define CAR_CMD_NAME "/car_cmd"
 
@@ -34,6 +24,7 @@ pthread_t carReceiverThread;
 pthread_t carControllerThread;
 pthread_t calculateSpeedThread;
 pthread_t getCarSpeedThread;
+pthread_t getUltraSonicDistanceThread;
 
 static struct mq_attr my_mq_attr;
 static mqd_t my_mq;
@@ -45,6 +36,7 @@ void carReceiver_main(void);
 void carController_main(void);
 void calculateSpeed_main(void);
 void getCarSpeed_main(void);
+void getUltraSonicDistance_main(void);
 
 void sig_handler(int signum) {
 	if (signum != SIGINT) {
@@ -60,6 +52,7 @@ void sig_handler(int signum) {
 	pthread_cancel(carControllerThread);
 	pthread_cancel(calculateSpeedThread);
 	pthread_cancel(getCarSpeedThread);
+	pthread_cancel(getUltraSonicDistanceThread);
 
 	mq_close(my_mq);
 	mq_unlink(CAR_CMD_NAME);
@@ -74,7 +67,8 @@ int main(void) {
 	signal(SIGINT, sig_handler);
 
 	counter = 0;
-	init_car();
+	//init_car();
+	wiringPiSetup();
 
 	my_mq_attr.mq_maxmsg = 10;
 	my_mq_attr.mq_msgsize = sizeof(counter);
@@ -117,25 +111,44 @@ int main(void) {
 		ASSERT(status == 0);
 	}
 
+	printf("Calculate getUltraSonicDistanceThread\n");
+	status = pthread_create(&getUltraSonicDistanceThread, &attr, (void*)&getUltraSonicDistance_main, NULL);
+	if (status != 0) {
+		printf("Failed to create getUltraSonicDistanceThread with status = %d\n", status);
+		ASSERT(status == 0);
+	}
+
 	pthread_join(carReceiverThread, NULL);
 	pthread_join(carControllerThread, NULL);
 	pthread_join(calculateSpeedThread, NULL);
 	pthread_join(getCarSpeedThread, NULL);
+	pthread_join(getUltraSonicDistanceThread, NULL);
 
 	sig_handler(SIGINT);
 
 	return 0;
 }
-
-void getCarSpeed_main(void)
+void getUltraSonicDistance_main(void)
 {
 	while (1)
 	{
-		usleep(1000000);
-		printf("%f km/h from main", car_speed);
+		//calculate_distance();
 	}
 }
-void calculateSpeed_main(void) 
+void getCarSpeed_main(void)
+{
+
+	while (1)
+	{
+		usleep(100000);
+		if (car_speed != change_speed)
+		{
+			printf("%f km/h from main", car_speed);
+		}
+		change_speed = car_speed;
+	}
+}
+void calculateSpeed_main(void)
 {
 	car_speed = 0;
 	init_sensor();

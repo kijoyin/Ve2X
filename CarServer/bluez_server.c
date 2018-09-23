@@ -123,7 +123,7 @@ sdp_session_t *register_service(uint8_t rfcomm_channel) {
 }
 
 int init_server() {
-	int port = 3, result, sock, client, bytes_read, bytes_sent;
+	int port = 5, result, sock, client, bytes_read, bytes_sent;
 	struct sockaddr_rc loc_addr = { 0 }, rem_addr = { 0 };
 	char buffer[1024] = { 0 };
 	socklen_t opt = sizeof(rem_addr);

@@ -6,6 +6,7 @@
     <ClInclude Include="include\util.h" />
     <ClInclude Include="include\calculate_speed.h" />
     <ClInclude Include="include\GlobalV.h" />
+    <ClInclude Include="include\ultrasonic_distance.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bluez_server.c" />
@@ -14,5 +15,6 @@
     <ClCompile Include="main.c" />
     <ClCompile Include="util.c" />
     <ClCompile Include="GlobalV.c" />
+    <ClCompile Include="ultrasonic_distance.c" />
   </ItemGroup>
 </Project>

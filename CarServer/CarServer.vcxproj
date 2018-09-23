@@ -69,6 +69,7 @@
     <ClInclude Include="include\calculate_speed.h" />
     <ClInclude Include="include\control_car.h" />
     <ClInclude Include="include\GlobalV.h" />
+    <ClInclude Include="include\ultrasonic_distance.h" />
     <ClInclude Include="include\util.h" />
   </ItemGroup>
   <ItemGroup>
@@ -76,6 +77,7 @@
     <ClCompile Include="calculate_speed.c" />
     <ClCompile Include="control_car.c" />
     <ClCompile Include="GlobalV.c" />
+    <ClCompile Include="ultrasonic_distance.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="util.c" />
   </ItemGroup>
