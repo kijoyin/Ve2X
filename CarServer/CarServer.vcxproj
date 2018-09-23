@@ -65,18 +65,19 @@
     </ProjectPublicIncludePath>
   </PropertyGroup>
   <ItemGroup>
-    <ClCompile Include="bluez_server.c" />
-    <ClCompile Include="calculate_speed.c" />
-    <ClCompile Include="control_car.c" />
-    <ClCompile Include="main.c" />
-    <ClCompile Include="traffic_light.cpp" />
-    <ClCompile Include="util.c" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="include\bluez_server.h" />
     <ClInclude Include="include\calculate_speed.h" />
     <ClInclude Include="include\control_car.h" />
+    <ClInclude Include="include\GlobalV.h" />
     <ClInclude Include="include\util.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="bluez_server.c" />
+    <ClCompile Include="calculate_speed.c" />
+    <ClCompile Include="control_car.c" />
+    <ClCompile Include="GlobalV.c" />
+    <ClCompile Include="main.c" />
+    <ClCompile Include="util.c" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>

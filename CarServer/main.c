@@ -22,7 +22,9 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <calculate_speed.h>
+#include <GlobalV.h>
 
+extern void init_sensor();
 
 #define CAR_CMD_NAME "/car_cmd"
 
@@ -31,6 +33,7 @@ char carCMD[1024];
 pthread_t carReceiverThread;
 pthread_t carControllerThread;
 pthread_t calculateSpeedThread;
+pthread_t getCarSpeedThread;
 
 static struct mq_attr my_mq_attr;
 static mqd_t my_mq;
@@ -41,6 +44,7 @@ static char *message = "abcd";
 void carReceiver_main(void);
 void carController_main(void);
 void calculateSpeed_main(void);
+void getCarSpeed_main(void);
 
 void sig_handler(int signum) {
 	if (signum != SIGINT) {
@@ -55,6 +59,7 @@ void sig_handler(int signum) {
 	pthread_cancel(carReceiverThread);
 	pthread_cancel(carControllerThread);
 	pthread_cancel(calculateSpeedThread);
+	pthread_cancel(getCarSpeedThread);
 
 	mq_close(my_mq);
 	mq_unlink(CAR_CMD_NAME);
@@ -105,16 +110,34 @@ int main(void) {
 		ASSERT(status == 0);
 	}
 
+	printf("Calculate speed thread\n");
+	status = pthread_create(&getCarSpeedThread, &attr, (void*)&getCarSpeed_main, NULL);
+	if (status != 0) {
+		printf("Failed to create calcuate speed with status = %d\n", status);
+		ASSERT(status == 0);
+	}
+
 	pthread_join(carReceiverThread, NULL);
 	pthread_join(carControllerThread, NULL);
 	pthread_join(calculateSpeedThread, NULL);
+	pthread_join(getCarSpeedThread, NULL);
 
 	sig_handler(SIGINT);
 
 	return 0;
 }
+
+void getCarSpeed_main(void)
+{
+	while (1)
+	{
+		usleep(1000000);
+		printf("%f km/h from main", car_speed);
+	}
+}
 void calculateSpeed_main(void) 
 {
+	car_speed = 0;
 	init_sensor();
 }
 void carReceiver_main(void) {

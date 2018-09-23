@@ -1,17 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="bluez_server.c" />
-    <ClCompile Include="control_car.c" />
-    <ClCompile Include="util.c" />
-    <ClCompile Include="main.c" />
-    <ClCompile Include="calculate_speed.c" />
-    <ClCompile Include="traffic_light.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="include\bluez_server.h" />
     <ClInclude Include="include\control_car.h" />
     <ClInclude Include="include\util.h" />
     <ClInclude Include="include\calculate_speed.h" />
+    <ClInclude Include="include\GlobalV.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="bluez_server.c" />
+    <ClCompile Include="calculate_speed.c" />
+    <ClCompile Include="control_car.c" />
+    <ClCompile Include="main.c" />
+    <ClCompile Include="util.c" />
+    <ClCompile Include="GlobalV.c" />
   </ItemGroup>
 </Project>

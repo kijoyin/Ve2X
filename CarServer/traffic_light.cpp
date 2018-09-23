@@ -23,5 +23,5 @@ void init_traffic_light(int green, int red, int yellow)
 }
 
 int main(void) {
-	init_traffic_light(29, 28, 27);
+	init_traffic_light(29, 27, 28);
 }
