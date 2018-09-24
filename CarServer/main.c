@@ -5,7 +5,6 @@
 #include <util.h>
 #include <control_car.h>
 #include <bluez_server.h>
-#include <ultrasonic_distance.h>
 #include <wiringPi.h>
 #include <sys/time.h>
 #include <sys/stat.h>
@@ -14,6 +13,7 @@
 #include <errno.h>
 #include <calculate_speed.h>
 #include <GlobalV.h>
+#include <ultrasonic_distance.h>
 
 
 #define CAR_CMD_NAME "/car_cmd"
@@ -67,8 +67,9 @@ int main(void) {
 	signal(SIGINT, sig_handler);
 
 	counter = 0;
-	//init_car();
-	wiringPiSetup();
+	if (wiringPiSetup() == -1)
+		exit(1);
+	init_car();
 
 	my_mq_attr.mq_maxmsg = 10;
 	my_mq_attr.mq_msgsize = sizeof(counter);
@@ -132,7 +133,10 @@ void getUltraSonicDistance_main(void)
 {
 	while (1)
 	{
-		//calculate_distance();
+		if (ping() != -1)
+		{
+			printf("Distance: %.2f cm.\n", distance_to_crash);
+		}
 	}
 }
 void getCarSpeed_main(void)

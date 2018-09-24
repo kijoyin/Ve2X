@@ -1,54 +1,67 @@
 #include <wiringPi.h>
+#include <time.h>
 #include <stdio.h>
-
-#define GPIO22     23
-#define GPIO23     22
-
-
-static int trigger = GPIO22;
-static int echo = GPIO23;
-
-static volatile long startTimeUsec;
-static volatile long endTimeUsec;
-
-void recordPulseLength() {
-	startTimeUsec = micros();
-	while (digitalRead(echo) == HIGH);
-	endTimeUsec = micros();
-}
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <GlobalV.h>
 
 
-int calculate_distance()
+int TRIG = 4, ECHO = 5;
+struct timespec start, end, timeoutStart, timeoutEnd;
+
+int ping()
 {
-	double speedOfSoundMetersPerSecond = 340.29;
+	long ping = 0, timeoutStart_s = 0;
+	long pong = 0, timeoutEnd_s = 0;
+	float distance = 0;
+	long timeout = 500000; // 0.5 sec ~ 171 m
 
-	wiringPiSetup();
+	pinMode(TRIG, OUTPUT);
+	pinMode(ECHO, INPUT);
 
-	pinMode(trigger, OUTPUT);
-	pinMode(echo, INPUT);
+	// Ensure trigger is low.
+	digitalWrite(TRIG, LOW);
+	delay(50);
 
-	// Initialize the sensor's trigger pin to low. If we don't pause
-	// after setting it to low, sometimes the sensor doesn't work right.
-	digitalWrite(trigger, LOW);
-	delay(500); // .5 seconds
-
-	// Triggering the sensor for 10 microseconds will cause it to send out
-	// 8 ultrasonic (40Khz) bursts and listen for the echos.
-	digitalWrite(trigger, HIGH);
+	// Trigger the ping.
+	digitalWrite(TRIG, HIGH);
 	delayMicroseconds(10);
-	digitalWrite(trigger, LOW);
+	digitalWrite(TRIG, LOW);
 
-	// The sensor will raise the echo pin high for the length of time that it took
-	// the ultrasonic bursts to travel round trip.
-	// Doesn't work; endTimeUsec and startTimeUsec are always the same.
-	//wiringPiISR(echo, INT_EDGE_RISING, &recordPulseLength);
-	while (digitalRead(echo) == LOW);
-	recordPulseLength();
+	clock_gettime(1, &timeoutStart);
+	timeoutStart_s = timeoutStart.tv_nsec *0.001;
+	// Wait for ping response, or timeout.
+	while (digitalRead(ECHO) == LOW) {
+		clock_gettime(1, &timeoutEnd);
+		timeoutEnd_s = timeoutEnd.tv_nsec *0.001;
+		if ((timeoutEnd_s - timeoutStart_s) > timeout)
+		{
+			return -1;
+		}
+	}
+	clock_gettime(1, &start);
+	ping = start.tv_nsec *0.001;
 
-	long travelTimeUsec = endTimeUsec - startTimeUsec;
-	double distanceMeters = ((travelTimeUsec / 1000000.0)*speedOfSoundMetersPerSecond) / 2;
+	// Wait for pong response, or timeout.
+	clock_gettime(1, &timeoutStart);
+	timeoutStart_s = timeoutStart.tv_nsec *0.001;
+	while (digitalRead(ECHO) == HIGH) {
+		clock_gettime(1, &timeoutEnd);
+		timeoutEnd_s = timeoutEnd.tv_nsec *0.001;
+		if ((timeoutEnd_s - timeoutStart_s) > timeout)
+		{
+			return -1;
+		}
+	}
+	clock_gettime(1, &end);
+	pong = end.tv_nsec *0.001;
 
-	printf("Distance is %s cm", distanceMeters * 100);
 
-	return 0;
+	// Convert ping duration to distance.
+	distance_to_crash = (float)(pong - ping) * 0.017150;
+
+	//printf("Distance: %.2f cm.\n", distance_to_crash);
+
+	return 1;
 }

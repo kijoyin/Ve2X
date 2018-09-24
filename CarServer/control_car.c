@@ -6,14 +6,11 @@ static int leftBackwardPin = 28;
 static int rightForwardPin = 25;
 static int rightBackwardPin = 24;
 static int pmwPin = 1;
-static int speed = 800;
+static int speed = 90;
 static bool forward = true;
 
 void init_car()
 {
-	if (wiringPiSetup() == -1)
-		exit(1);
-
 	pinMode(leftForwardPin, OUTPUT);
 	pinMode(leftBackwardPin, OUTPUT);
 	pinMode(rightForwardPin, OUTPUT);
@@ -23,7 +20,7 @@ void init_car()
 }
 void start_car()
 {
-	speed = 800;
+	speed = 90;
 	forward = true;
 	pwmWrite(pmwPin, speed);
 	digitalWrite(leftBackwardPin, LOW);
@@ -104,15 +101,25 @@ void stop_start_right()
 
 void accelerate(bool acc)
 {
-	if (acc && speed < 1000)
+	if (acc && speed <= 100)
 	{
-		speed = speed + 50;
+		speed = speed + 10;
+		if (speed > 100)
+		{
+			speed = 100;
+		}
 		pwmWrite(pmwPin, speed);
+		printf("Increasing speed to %d", speed);
 	}
-	else if (!acc && speed < 200)
+	else if (!acc && speed > 20)
 	{
-		speed = speed - 50;
+		speed = speed - 10;
+		if (speed < 20)
+		{
+			speed = 20;
+		}
 		pwmWrite(pmwPin, speed);
+		printf("Recuding speed to %d", speed);
 	}
 }
 
