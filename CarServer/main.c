@@ -14,17 +14,22 @@
 #include <calculate_speed.h>
 #include <GlobalV.h>
 #include <ultrasonic_distance.h>
+#include <sys/ipc.h>
+#include <sys/shm.h> 
 
 
 #define CAR_CMD_NAME "/car_cmd"
 
 char carCMD[1024];
+char *messageToSend;
+int shmid;
 
 pthread_t carReceiverThread;
 pthread_t carControllerThread;
 pthread_t calculateSpeedThread;
 pthread_t getCarSpeedThread;
 pthread_t getUltraSonicDistanceThread;
+pthread_t sendToMainServerThread;
 
 static struct mq_attr my_mq_attr;
 static mqd_t my_mq;
@@ -37,6 +42,7 @@ void carController_main(void);
 void calculateSpeed_main(void);
 void getCarSpeed_main(void);
 void getUltraSonicDistance_main(void);
+void sendToMainServer_main(void);
 
 void sig_handler(int signum) {
 	if (signum != SIGINT) {
@@ -48,11 +54,16 @@ void sig_handler(int signum) {
 
 	AllLow();// Clean up the pins
 
+	tear_shared_memory();
+	car_speed = 0;
+	distance_to_crash = 0;
+
 	pthread_cancel(carReceiverThread);
 	pthread_cancel(carControllerThread);
 	pthread_cancel(calculateSpeedThread);
 	pthread_cancel(getCarSpeedThread);
 	pthread_cancel(getUltraSonicDistanceThread);
+	pthread_cancel(sendToMainServerThread);
 
 	mq_close(my_mq);
 	mq_unlink(CAR_CMD_NAME);
@@ -70,6 +81,7 @@ int main(void) {
 	if (wiringPiSetup() == -1)
 		exit(1);
 	init_car();
+	setup_shared_memory();
 
 	my_mq_attr.mq_maxmsg = 10;
 	my_mq_attr.mq_msgsize = sizeof(counter);
@@ -118,24 +130,67 @@ int main(void) {
 		printf("Failed to create getUltraSonicDistanceThread with status = %d\n", status);
 		ASSERT(status == 0);
 	}
+	printf("Calculate sendToMainServerThread\n");
+	status = pthread_create(&sendToMainServerThread, &attr, (void*)&sendToMainServer_main, NULL);
+	if (status != 0) {
+		printf("Failed to create sendToMainServerThread with status = %d\n", status);
+		ASSERT(status == 0);
+	}
 
 	pthread_join(carReceiverThread, NULL);
 	pthread_join(carControllerThread, NULL);
 	pthread_join(calculateSpeedThread, NULL);
 	pthread_join(getCarSpeedThread, NULL);
 	pthread_join(getUltraSonicDistanceThread, NULL);
+	pthread_join(sendToMainServerThread, NULL);
 
 	sig_handler(SIGINT);
 
 	return 0;
 }
+void sendToMainServer_main(void)
+{
+	while (1)
+	{
+		/*usleep(100000);
+		if (car_speed != change_speed)
+		{
+			sprintf(messageToSend, "%d", car_speed);
+			printf("%d km/h from main /n", car_speed);
+		}*/
+		sprintf(messageToSend, "%d", car_speed);
+		printf("%d Speed /n", car_speed);
+	}
+
+}
+void setup_shared_memory()
+{
+	// We use a shared data segment to communicate the speed (interprocess communication)
+	key_t key = ftok("shmfile", 65);
+	// shmget returns an identifier in shmid 
+	shmid = shmget(key, 1024, 0666 | IPC_CREAT);
+	if (shmid == -1) {
+		perror("Shared Memory failure.");
+		exit(0);
+	}
+	// shmat to attach to shared memory 
+	messageToSend = (char*)shmat(shmid, (void*)0, 0);
+}
+void tear_shared_memory()
+{
+	//detach from shared memory  
+	shmdt(messageToSend);
+	// destroy the shared memory 
+	shmctl(shmid, IPC_RMID, NULL);
+}
+
 void getUltraSonicDistance_main(void)
 {
 	while (1)
 	{
 		if (ping() != -1)
 		{
-			printf("Distance: %.2f cm.\n", distance_to_crash);
+			//printf("Distance: %.2f cm.\n", distance_to_crash);
 		}
 	}
 }
@@ -147,7 +202,7 @@ void getCarSpeed_main(void)
 		usleep(100000);
 		if (car_speed != change_speed)
 		{
-			printf("%f km/h from main", car_speed);
+			//printf("%f km/h from main", car_speed);
 		}
 		change_speed = car_speed;
 	}

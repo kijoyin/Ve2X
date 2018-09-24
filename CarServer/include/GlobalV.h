@@ -1,4 +1,4 @@
 #pragma once
-double car_speed;
-double change_speed;
+int car_speed;
+int change_speed;
 double distance_to_crash;

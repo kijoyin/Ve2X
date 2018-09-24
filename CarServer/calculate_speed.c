@@ -6,7 +6,7 @@
 
 int butPin = 15;
 time_t now, later;
-struct timespec start, end;
+struct timespec speed_start, speed_end;
 
 void detect_rotation(void)
 {
@@ -17,22 +17,22 @@ void detect_rotation(void)
 		//double diff = difftime(later,now);
 		//double diff = later - now;
 		//printf("%.20f seconds \n", diff);
-		clock_gettime(1, &end);
+		clock_gettime(1, &speed_end);
 
 		// Calculating total time taken by the program. 
 		double diff;
-		diff = (end.tv_sec - start.tv_sec) * 1e9;
-		diff = (diff + (end.tv_nsec - start.tv_nsec)) * 1e-9;
+		diff = (speed_end.tv_sec - speed_start.tv_sec) * 1e9;
+		diff = (diff + (speed_end.tv_nsec - speed_start.tv_nsec)) * 1e-9;
 		double elapsedinMinutes = diff * 0.0166667;
 		double rpm = 1 / elapsedinMinutes;
 		double distance = rpm * 22;
 		double speed = distance / 1;
-		double speedKms = speed * .0006;
+		double speedKms = speed * .6;
 		car_speed = speedKms;
-		printf("%f km/h", speedKms);
+		//printf("%d km/h", speedKms);
 	}
 	else {
-		clock_gettime(1, &start);
+		clock_gettime(1, &speed_start);
 	}
 }
 

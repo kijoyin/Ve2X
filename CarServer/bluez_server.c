@@ -123,7 +123,7 @@ sdp_session_t *register_service(uint8_t rfcomm_channel) {
 }
 
 int init_server() {
-	int port = 5, result, sock, client, bytes_read, bytes_sent;
+	int port = 10, result, sock, client, bytes_read, bytes_sent;
 	struct sockaddr_rc loc_addr = { 0 }, rem_addr = { 0 };
 	char buffer[1024] = { 0 };
 	socklen_t opt = sizeof(rem_addr);
@@ -152,8 +152,12 @@ int init_server() {
 
 	// accept one connection
 	printf("calling accept()\n");
-	client = accept(sock, (struct sockaddr *)&rem_addr, &opt);
-	printf("accept() returned %d\n", client);
+	client = -1;
+	while (client == -1)
+	{
+		client = accept(sock, (struct sockaddr *)&rem_addr, &opt);
+		printf("accept() returned %d\n", client);
+	}
 
 	ba2str(&rem_addr.rc_bdaddr, buffer);
 	fprintf(stderr, "accepted connection from %s\n", buffer);
